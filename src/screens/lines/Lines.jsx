@@ -88,7 +88,7 @@ const AddLineSchema = yup.object().shape({
 
 
 
-  //Fetch Line after subimit
+  //Fetch Line after submit
   const fetchData = async () => {
     let list = [];
     try {

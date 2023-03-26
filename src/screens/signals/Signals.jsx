@@ -39,6 +39,9 @@ import {
 } from "firebase/firestore";
 import { db, storage } from "../../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import dayjs from "dayjs";
+import relativeTime from 'dayjs/plugin/relativeTime'
+
 
 const AddSignalSchema = yup.object().shape({
   signalName: yup.string().required("Start Place Required"),
@@ -276,9 +279,17 @@ const Signals = () => {
     fetchLineToSelect();
   }, [line]);
 
-  console.log("lineDetails", lineDetail);
-  console.log("line", line);
-  console.log("file", filterderData);
+
+  dayjs.extend(relativeTime)
+
+
+  const convertDate = (timeStamp)=>{
+    const convertedDate = timeStamp.toDate();
+ //   const formatedDate = format(convertedDate, 'yyyy/MM/dd')
+return dayjs(convertedDate).fromNow(true)
+  }
+
+  
   return (
     <Box>
       <Navbar />
@@ -399,7 +410,9 @@ const Signals = () => {
                           </TableCell>
                           <TableCell align="center">
                             <Typography variant="body2" sx={style.pending}>
-                              Date
+                             {
+                                   convertDate(row?.timeStamp)
+                             }
                             </Typography>
                           </TableCell>
                           <TableCell align="center">

@@ -30,6 +30,7 @@ import {
   addDoc,
   collection,
   doc,
+  getDoc,
   getDocs,
   query,
   serverTimestamp,
@@ -37,6 +38,8 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "../../firebase";
+import dayjs from "dayjs";
+import relativeTime from 'dayjs/plugin/relativeTime'
 
 const AddTrainSchema = yup.object().shape({
   trainNo: yup.string().required("Train No is Required"),
@@ -53,6 +56,11 @@ const Trains = () => {
   const [filterByLine, setFilterByLine] = useState("");
   const [filterderData, setFilteredData] = useState([]);
   const [loadingInsertTrains, setLoadingInsertTrains] = useState(false);
+  const [loadingLineToSelect, setLoadingLineToSelect] = useState(false);
+  const [lineDetail, setLineDetail] = useState(null);
+  const [linesFromDb, setLinesFromDb] = useState([]);
+
+
 
   const handleChangeLine = (e) => {
     setLine(e.target.value);
@@ -162,11 +170,12 @@ const Trains = () => {
         try {
           const docRef = await addDoc(collection(db, "trains"), {
             trainNo: trainNo,
-            line: line,
+            line: lineDetail.lineName,
             stTime: stTime,
             stPlace: stPlace,
             destPlace: destPlace,
             destTime: destTiime,
+            lineNo : lineDetail.lineNo,
             timeStamp: serverTimestamp(),
           });
           resetForm((values = ""));
@@ -191,6 +200,57 @@ const Trains = () => {
     }
     setOpenSnackbar(false);
   };
+//Fetch Line To select Box
+
+  useEffect(() => {
+    const fetchLineToSelect = async () => {
+      setLoadingLineToSelect(true);
+      if (line === "") {
+        setLineDetail(null);
+      } else {
+        const docRef = doc(db, "lines", line);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setLineDetail(docSnap.data());
+        } else {
+          console.log("No such document!");
+        }
+      }
+      setLoadingLineToSelect(false);
+    };
+    fetchLineToSelect();
+  }, [line]);
+
+
+  //Fetch Line
+
+  useEffect(() => {
+    const fetchLineToSelectBox = async () => {
+      let list = [];
+      try {
+        const querySnapshot = await getDocs(collection(db, "lines"));
+        querySnapshot.forEach((doc) => {
+          list.push({ id: doc.id, ...doc.data() });
+        });
+        setLinesFromDb(list);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchLineToSelectBox();
+  }, []);
+
+
+
+  dayjs.extend(relativeTime)
+
+
+  const convertDate = (timeStamp)=>{
+    const convertedDate = timeStamp.toDate();
+ //   const formatedDate = format(convertedDate, 'yyyy/MM/dd')
+return dayjs(convertedDate).fromNow(true)
+  }
 
   return (
     <Box>
@@ -316,7 +376,7 @@ const Trains = () => {
                           </TableCell>
                           <TableCell align="center">
                             <Typography variant="body2" sx={style.pending}>
-                              Date
+                              {convertDate(row?.timeStamp)}
                             </Typography>
                           </TableCell>
                           <TableCell align="center">
@@ -411,10 +471,57 @@ const Trains = () => {
                       size="small"
                       autoWidth
                     >
-                      <MenuItem value="Main Line">Main Line</MenuItem>
-                      <MenuItem value="Cost Line">Coast Line</MenuItem>
-                      <MenuItem value="KV Line">KV Line</MenuItem>
-                    </Select>
+                      <MenuItem value="">Select Line</MenuItem>
+                      {linesFromDb.map((li) => (
+                        <MenuItem value={li?.id} key={li.id}>
+                          {li?.lineName}
+                        </MenuItem>
+                      ))}
+                                          </Select>
+                  </Box>
+                  <Box>
+                  {loadingLineToSelect ? (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <CircularProgress />
+                    </Box>
+                  ) : (
+                    lineDetail && (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "flex-start",
+                          alignItems: "center",
+                          gap: 2,
+                          border: "1px, solid gray",
+                          backgroundColor: "#eeeeee",
+                          padding: 2,
+                        }}
+                      >
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="body2">
+                            Line No - {lineDetail?.lineNo}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="body2">
+                            Start At - {lineDetail?.stPlace}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="body2">
+                            End At -{lineDetail?.endPlace}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    )
+                  )}
                   </Box>
                 </Box>
                 <Box sx={style.rightSide}>
@@ -585,6 +692,7 @@ const style = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
+    paddingTop:2,
   },
   leftSide: {
     flex: 1,

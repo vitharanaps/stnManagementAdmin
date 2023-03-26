@@ -95,7 +95,7 @@ const Signals = () => {
         search === ""
           ? data
           : data?.filter((dt) =>
-              dt.trainNo.toLowerCase().includes(search.toLowerCase())
+              dt.signalName.toLowerCase().includes(search.toLowerCase())
             )
       );
     };
@@ -110,7 +110,7 @@ const Signals = () => {
         const optionsRef = collection(db, "signals");
         const q = query(
           optionsRef,
-          filterByLine !== "" && where("line", "==", filterByLine)
+          filterByLine !== "" && where("lineNo", "==", filterByLine)
         );
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach((doc) => {
@@ -152,7 +152,8 @@ const Signals = () => {
     //check Train No is Unique
     const qSignalName = query(
       collection(db, "signals"),
-      where("signalName", "==", signalName)
+      where("signalName", "==", signalName),
+      where("lineNo", "==", lineDetail.lineNo)
     );
     const querySnapshotSignalName = await getDocs(qSignalName);
     const countSignalNo = querySnapshotSignalName.size;
@@ -160,9 +161,11 @@ const Signals = () => {
     if (line === "") {
       alert("Please Select Line");
     } else if (file === null) {
-      alert("Please Select Siganal Image");
+      alert("Please Select Signal Image");
     } else {
-      if (countSignalNo === 0) {
+      if (countSignalNo <= 0) {
+        console.log("sig count", countSignalNo)
+
         try {
           const docRef = await addDoc(collection(db, "signals"), {
             signalName: signalName,
@@ -175,6 +178,8 @@ const Signals = () => {
           handleClose();
           fetchData();
           setOpenSnackbar(true);
+          setDownloardableUrl(null)
+          setLineDetail(null)
         } catch (err) {
           console.log(err);
         }
@@ -317,7 +322,7 @@ const Signals = () => {
               >
                 <TextField
                   size="small"
-                  placeholder="Serach By Signal Name"
+                  placeholder="Search By Signal Name"
                   onChange={handleSearchChange}
                 />
                 Line
@@ -328,7 +333,7 @@ const Signals = () => {
                 >
                   <MenuItem value="">Select Line</MenuItem>
                   {linesFromDb.map((li) => (
-                    <MenuItem value={li?.id} key={li.id}>
+                    <MenuItem value={li?.lineNo} key={li.id}>
                       {li?.lineName}
                     </MenuItem>
                   ))}
@@ -453,7 +458,11 @@ const Signals = () => {
                 <Box sx={style.leftSide}>
                   <Box sx={{ width: "150px", height: "150px" }}>
                     <img
-                      src="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-image-512.png"
+                      src={
+                        downloardableUrl
+                          ? downloardableUrl
+                          : "https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-image-512.png"
+                      }
                       alt="text"
                       width="100%"
                       height="100%"

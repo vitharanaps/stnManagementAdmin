@@ -180,7 +180,15 @@ const ViewUserDetails = () => {
                   }}
                 >
                   <img
-                    src="https://images.unsplash.com/photo-1564564321837-a57b7070ac4f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8OHx8bWFufGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60"
+
+                    src=
+                    {                   userData?.profileImage ?
+                      userData?.profileImage
+                      :
+                      "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"
+                    }
+                    
+                 
                     alt="userImg"
                     className="imgClass"
                   />

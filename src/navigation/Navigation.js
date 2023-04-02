@@ -9,6 +9,10 @@ import Signals from '../screens/signals/Signals';
 import Stns from '../screens/stn/Stns';
 import Trains from '../screens/trains/Trains';
 import User from '../screens/user/User';
+import ViewLine from '../screens/viewLine/ViewLine';
+import ViewSignals from '../screens/viewSignals/ViewSignals';
+import ViewStns from '../screens/viewStns/ViewStns';
+import ViewTrain from '../screens/viewTrain/ViewTrain';
 import ViewUserDetails from '../screens/viewUserDetails/ViewUserDetails';
 
 const Navigation = () => {
@@ -31,6 +35,8 @@ const Navigation = () => {
                 </Route>
                 <Route path='stn' >
                     <Route index element={<RequireAuth ><Stns /></RequireAuth>} />
+                    <Route path=":my" element={<RequireAuth><ViewStns /></RequireAuth>} />
+
                     <Route path='*' element={<NotFound />} />
 
                 </Route>
@@ -43,21 +49,21 @@ const Navigation = () => {
                 </Route>
                 <Route path='trains' >
                     <Route index element={<RequireAuth><Trains /></RequireAuth>} />
-                    {/* <Route path=":my" element={<RequireAuth><ViewUserDetails /></RequireAuth>} />
-                    <Route path="newuser" element={<RequireAuth><NewUser /></RequireAuth>} /> */}
+                    <Route path=":my" element={<RequireAuth><ViewTrain /></RequireAuth>} />
+                    {/* <Route path="newuser" element={<RequireAuth><NewUser /></RequireAuth>} /> */}
 
                      {/* <Route path='*' element={<NotFound />} /> */}
                 </Route>
                 <Route path='lines' >
                     <Route index element={<RequireAuth><Lines /></RequireAuth>} />
-                    <Route path=":my" element={<RequireAuth><ViewUserDetails /></RequireAuth>} />
-                    <Route path="newuser" element={<RequireAuth><NewUser /></RequireAuth>} />
+                    <Route path=":my" element={<RequireAuth><ViewLine /></RequireAuth>} />
+                    {/* <Route path="newuser" element={<RequireAuth><NewUser /></RequireAuth>} /> */}
 
                      {/* <Route path='*' element={<NotFound />} /> */}
                 </Route>
                 <Route path='signals' >
                     <Route index element={<RequireAuth><Signals /></RequireAuth>} />
-                    <Route path=":my" element={<RequireAuth><ViewUserDetails /></RequireAuth>} />
+                    <Route path=":my" element={<RequireAuth><ViewSignals /></RequireAuth>} />
                     <Route path="newuser" element={<RequireAuth><NewUser /></RequireAuth>} />
 
                      {/* <Route path='*' element={<NotFound />} /> */}

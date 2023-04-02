@@ -41,6 +41,7 @@ import { db, storage } from "../../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import dayjs from "dayjs";
 import relativeTime from 'dayjs/plugin/relativeTime'
+import { useNavigate } from "react-router-dom";
 
 
 const AddSignalSchema = yup.object().shape({
@@ -60,6 +61,9 @@ const Signals = () => {
   const [lineDetail, setLineDetail] = useState(null);
   const [uploadingPers, setUploadingPers] = useState(null);
   const [loadingLineToSelect, setLoadingLineToSelect] = useState(false);
+
+
+  const navigate = useNavigate();
 
   const handleChangeLine = (e) => {
     setLine(e.target.value);
@@ -289,6 +293,13 @@ const Signals = () => {
 return dayjs(convertedDate).fromNow(true)
   }
 
+
+
+  const handleView = (id) => {
+    // navigate("/", { state: { id: id} });
+    navigate(`/signals/${id}`)
+   };
+
   
   return (
     <Box>
@@ -417,7 +428,7 @@ return dayjs(convertedDate).fromNow(true)
                           </TableCell>
                           <TableCell align="center">
                             <Box>
-                              <Button variant="contained" color="success">
+                              <Button variant="contained" color="success" onClick={()=>handleView(row?.id)}>
                                 {" "}
                                 View
                               </Button>

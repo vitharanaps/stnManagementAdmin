@@ -42,6 +42,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { format } from 'date-fns';
 import dayjs from "dayjs";
 import relativeTime from 'dayjs/plugin/relativeTime'
+import { useNavigate } from "react-router-dom";
 
 
 const AddSignalSchema = yup.object().shape({
@@ -66,6 +67,8 @@ const [train, setTrain]= useState(null)
 const [trainFromDb, setTrainFromDb] = useState([])
 const [loadingTrainToSelect, setLoadingTrainToSelect] = useState(false)
 
+
+const navigate = useNavigate();
   const handleChangeLine = (e) => {
     setLine(e.target.value);
   };
@@ -160,17 +163,22 @@ const [loadingTrainToSelect, setLoadingTrainToSelect] = useState(false)
     const { stnNo } = values;
 
     //check Train No is Unique
-    // const qSignalName = query(
-    //   collection(db, "stns"),
-    //   where("trainNo", "==", signalName)
-    // );
-    // const querySnapshotSignalName = await getDocs(qSignalName);
-    // const countSignalNo = querySnapshotSignalName.size;
+    const qTrainNo = query(
+      collection(db, "stns"),
+      where("trainNo", "==", trainDetail?.trainNo)
+    );
+    const querySnapshotTrainNo = await getDocs(qTrainNo);
+    const countTrain = querySnapshotTrainNo.size;
     if (train === "") {
       alert("Please Select Train");
     } else if (file === null) {
       alert("Please Select Stn Image");
-    } else {
+    }else if(countTrain >0){
+      alert("STN Available for This Train Number")
+    } 
+    
+    
+    else {
 
         try {
           const docRef = await addDoc(collection(db, "stns"), {
@@ -182,7 +190,7 @@ const [loadingTrainToSelect, setLoadingTrainToSelect] = useState(false)
             destTime:trainDetail?.destTime,
             line: trainDetail.line,
             lineNo: trainDetail.lineNo,
-            signalImage: downloardableUrl,
+            stnImage: downloardableUrl,
             timeStamp: serverTimestamp(),
           });
           resetForm((values = ""));
@@ -262,6 +270,8 @@ const [loadingTrainToSelect, setLoadingTrainToSelect] = useState(false)
     };
     fetchLineToSelectBox();
   }, []);
+
+  console.log("line", linesFromDb)
   //Fetch Line To select Box
 
   useEffect(() => {
@@ -332,6 +342,13 @@ return dayjs(convertedDate).fromNow(true)
 
   dayjs.extend(relativeTime)
 console.log(train)
+
+
+const handleView = (id) => {
+  // navigate("/", { state: { id: id} });
+  navigate(`/stn/${id}`)
+ };
+
   return (
     <Box>
       <Navbar />
@@ -385,9 +402,9 @@ console.log(train)
                   onChange={handleChangefilterByLine}
                 >
                   <MenuItem value="">Select Line</MenuItem>
-                  {linesFromDb.map((tr) => (
-                    <MenuItem value={tr?.trainNo} key={tr.id}>
-                      {tr?.trainName}
+                  {linesFromDb.map((li) => (
+                    <MenuItem value={li?.lineNo} key={li.id}>
+                      {li?.lineName}
                     </MenuItem>
                   ))}
                 </Select>
@@ -472,7 +489,7 @@ console.log(train)
                           </TableCell>
                           <TableCell align="center">
                             <Box>
-                              <Button variant="contained" color="success">
+                              <Button variant="contained" color="success" onClick={()=>handleView(row?.id)} >
                                 {" "}
                                 View
                               </Button>
@@ -673,7 +690,7 @@ console.log(train)
           severity="success"
           sx={{ width: "100%" }}
         >
-          Successfully Added Signal to database !
+          Successfully Added STN to database !
         </Alert>
       </Snackbar>
     </Box>

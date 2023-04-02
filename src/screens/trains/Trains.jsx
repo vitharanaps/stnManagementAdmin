@@ -40,6 +40,7 @@ import {
 import { db } from "../../firebase";
 import dayjs from "dayjs";
 import relativeTime from 'dayjs/plugin/relativeTime'
+import { useNavigate } from "react-router-dom";
 
 const AddTrainSchema = yup.object().shape({
   trainNo: yup.string().required("Train No is Required"),
@@ -50,6 +51,7 @@ const AddTrainSchema = yup.object().shape({
 });
 
 const Trains = () => {
+  const navigate= useNavigate()
   const [line, setLine] = useState("");
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
@@ -252,6 +254,11 @@ const Trains = () => {
 return dayjs(convertedDate).fromNow(true)
   }
 
+  const handleView = (id) => {
+    // navigate("/", { state: { id: id} });
+    navigate(`/trains/${id}`)
+   };
+
   return (
     <Box>
       <Navbar />
@@ -381,7 +388,7 @@ return dayjs(convertedDate).fromNow(true)
                           </TableCell>
                           <TableCell align="center">
                             <Box>
-                              <Button variant="contained" color="success">
+                              <Button variant="contained" color="success" onClick={()=> handleView(row?.id)}>
                                 {" "}
                                 View
                               </Button>

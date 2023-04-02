@@ -83,7 +83,7 @@ const SideBar = () => {
               <ListItemIcon>
                 <TrafficIcon />
               </ListItemIcon>
-              <ListItemText primary="Signalss" />
+              <ListItemText primary="Signals" />
             </ListItemButton>
           </Link>
           <Link to="/user" style={{ textDecoration: "none", color: "black" }}>

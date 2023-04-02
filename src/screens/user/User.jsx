@@ -15,7 +15,7 @@ import UserTable from "../../component/userTable/UserTable";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import UserTableBasic from "../../component/userTable/UserTableBasic";
 import { db } from "../../firebase";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 
 const User = () => {
   const [pending, setPending] = useState("");
@@ -42,7 +42,10 @@ const User = () => {
     const fetchData = async () => {
       let list = [];
       try {
-        const querySnapshot = await getDocs(collection(db, "users"));
+        const optionsRef = collection(db, "users");
+        const q = query(optionsRef, orderBy("isConfirm", "asc"));
+        const querySnapshot = await getDocs(q);
+
         querySnapshot.forEach((doc) => {
           console.log(doc.data);
           list.push({ id: doc.id, ...doc.data() });
@@ -56,8 +59,7 @@ const User = () => {
     fetchData();
   }, []);
 
-  
-console.log('data', data)
+  console.log("data", data);
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
   };
@@ -67,7 +69,9 @@ console.log('data', data)
       setFilteredData(
         search === ""
           ? data
-          : data?.filter((dt) => dt.nameWithIn.toLowerCase().includes(search.toLowerCase()))
+          : data?.filter((dt) =>
+              dt.nameWithIn.toLowerCase().includes(search.toLowerCase())
+            )
       );
     };
     filterSearch();
@@ -96,7 +100,7 @@ console.log('data', data)
       console.log(err);
     }
   };
-
+  console.log(data);
   return (
     <Box>
       <Navbar />
@@ -151,8 +155,8 @@ console.log('data', data)
                 >
                   <MenuItem value="">Select Status</MenuItem>
 
-                  <MenuItem value={true}>Yes</MenuItem>
-                  <MenuItem value={false}>No</MenuItem>
+                  <MenuItem value={false}>Pending</MenuItem>
+                  <MenuItem value={true}>Approved</MenuItem>
                 </Select>
                 Home Station
                 <Select

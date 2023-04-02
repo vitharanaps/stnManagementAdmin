@@ -23,6 +23,7 @@ import {
 import { Formik } from "formik";
 import { addDoc, collection, getDocs, query, serverTimestamp, where } from "firebase/firestore";
 import { db } from "../../firebase";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -44,7 +45,7 @@ const AddLineSchema = yup.object().shape({
   const [loadingInsertLine, setLoadingInsertLine] = useState(false);
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
-
+const navigate = useNavigate();
 
   const [filteredData, setFilteredData] = useState([]);
 
@@ -152,6 +153,11 @@ const AddLineSchema = yup.object().shape({
   };
 
   
+  const handleView = (id) => {
+    // navigate("/", { state: { id: id} });
+    navigate(`/lines/${id}`)
+   };
+
     return (
       <Box>
         <Navbar />
@@ -169,7 +175,7 @@ const AddLineSchema = yup.object().shape({
             >
               <Box sx={style.title}>
                 <Typography varient="h7" color="gray">
-                  Manage STNs
+                  Manage Lines
                 </Typography>
               </Box>
             </Stack>
@@ -195,7 +201,7 @@ const AddLineSchema = yup.object().shape({
                 >
                   <TextField
                     size="small"
-                    placeholder="Search Here By Line Name"
+                    placeholder="Search By Line Name"
                     onChange={handleSearchChange}
                   />
                   {/*   Pending
@@ -270,7 +276,7 @@ const AddLineSchema = yup.object().shape({
                             
                             <TableCell align="center">
                               <Box>
-                                <Button variant="contained" color="success">
+                                <Button variant="contained" color="success" onClick={()=>handleView(row?.id)}>
                                   {" "}
                                   View
                                 </Button>

@@ -512,6 +512,9 @@ const ViewSignals = () => {
 /> */}
 
 </Box>
+<Box sx={style.closeBtn} >
+            <Button variant="contained" onClick={handleCloseModal} color="error">Close</Button>
+          </Box>
 
         </Box>
       </Modal>
@@ -615,5 +618,10 @@ const style = {
     boxShadow: 24,
     p: 4,
   },
+  closeBtn:{
+    position:"absolute",
+    top:10,
+    left:10
+  }
 };
 export default ViewSignals;

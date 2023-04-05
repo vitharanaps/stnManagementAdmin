@@ -571,6 +571,9 @@ const ViewStns = () => {
     height="100%"
   /> */}
           </Box>
+          <Box sx={style.closeBtn} >
+            <Button variant="contained" onClick={handleCloseModal} color="error">Close</Button>
+          </Box>
         </Box>
       </Modal>
     </Box>
@@ -673,5 +676,10 @@ const style = {
     boxShadow: 24,
     p: 4,
   },
+  closeBtn:{
+    position:"absolute",
+    top:10,
+    left:10
+  }
 };
 export default ViewStns;

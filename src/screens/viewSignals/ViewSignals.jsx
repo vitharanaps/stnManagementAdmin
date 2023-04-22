@@ -217,10 +217,10 @@ const ViewSignals = () => {
                         onClose={handleClose}
                         aria-describedby="alert-dialog-slide-description"
                       >
-                        <DialogTitle>{`Do You Want to Delete ${signalData?.trainNo}?`}</DialogTitle>
+                        <DialogTitle>{`Do You Want to Delete ${signalData?.signalName}?`}</DialogTitle>
                         <DialogContent>
                           <DialogContentText id="alert-dialog-slide-description">
-                            This is alert For Delete, {signalData?.trainNo} , do
+                            This is alert For Delete, do
                             You like It Press Agree or Do You Want to discard
                             Press Disagree, thank you
                           </DialogContentText>

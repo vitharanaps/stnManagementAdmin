@@ -1,19 +1,192 @@
 import { Box, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Person4Icon from "@mui/icons-material/Person4";
+import { PersonOutline } from "@mui/icons-material";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "../../firebase";
+import ArticleIcon from "@mui/icons-material/Article";
+import AddRoadIcon from "@mui/icons-material/AddRoad";
 
-const Widgets = () => {
+const Widgets = ({ type }) => {
+
+
+  const [numOfUser, setNumOfUser] =useState(0)
+const [numOfStn,setNumOfStn] = useState(0)
+const [numOfLines,setNumOfLines] = useState(0)
+const [numOfPendingUsers,setNumOfPendingUsers] = useState(0)
+
+
+  useEffect(() => {
+    const getUserCount = async() =>{
+
+      // const today = new Date();
+      // const lastMonth = new Date(new Date().setMonth(today.getMonth()- 1))
+      // const prevMonth = new Date(new Date().setMonth(today.getMonth()- 2))
+
+      const qUser = query(
+        collection(db, "users"));
+      const querySnapshotUser = await getDocs(qUser);
+    //  console.log(querySnapshotUser.docs)
+      const countUser = querySnapshotUser.size;
+      setNumOfUser(countUser)
+    }
+    getUserCount();
+    
+  
+  }, [])
+
+  useEffect(() => {
+    const getStnCount = async() =>{
+      const qStns = query(
+        collection(db, "stns"));
+      const querySnapshotStns = await getDocs(qStns);
+    //  console.log(querySnapshotUser.docs)
+      const countStns = querySnapshotStns.size;
+      setNumOfStn(countStns)
+    }
+    getStnCount();
+    
+  
+  }, [])
+  useEffect(() => {
+    const getLinesCount = async() =>{
+      const qLines = query(
+        collection(db, "lines"));
+      const querySnapshotLines = await getDocs(qLines);
+    //  console.log(querySnapshotUser.docs)
+      const countLines = querySnapshotLines.size;
+      setNumOfLines(countLines)
+    }
+    getLinesCount();
+    
+  
+  }, [])
+
+
+  useEffect(() => {
+    const getPendingUsers = async() =>{
+      const q = query(collection(db, "users"), where("isConfirm", "==", false));
+
+      const querySnapshotPendingUsers = await getDocs(q);
+    //  console.log(querySnapshotUser.docs)
+      const countPendingUsers = querySnapshotPendingUsers.size;
+      setNumOfPendingUsers(countPendingUsers)
+    }
+    getPendingUsers();
+    
+  
+  }, [])
+  let data;
+
+  switch (type) {
+    case "user":
+      data = {
+        title: "USERS",
+        link: "see all users",
+        count: numOfUser,
+        icon: (
+          <Person4Icon
+            sx={{
+              padding: "5px",
+              backgroundColor: "#79E44E",
+              borderRadius: 1,
+              color: "green",
+            }}
+          />
+        ),
+      };
+      break;
+    case "stn":
+      data = {
+        title: "STNS",
+        count : numOfStn,
+        link: "see all stns",
+        icon: <ArticleIcon
+        sx={{
+          padding: "5px",
+          backgroundColor: "#79E44E",
+          borderRadius: 1,
+          color: "green",
+        }}
+      />,
+      };
+      break;
+    case "line":
+      data = {
+        title: "LINES",
+        count : numOfLines,
+
+        link: "see all lines",
+        icon: <AddRoadIcon
+        sx={{
+          padding: "5px",
+          backgroundColor: "#79E44E",
+          borderRadius: 1,
+          color: "green",
+        }}
+      />,
+      };
+      break;
+    case "pending":
+      data = {
+        title: "PENDING",
+        count : numOfPendingUsers,
+
+        link: "see all Pending",
+        icon: <Person4Icon
+        sx={{
+          padding: "5px",
+          backgroundColor: "#79E44E",
+          borderRadius: 1,
+          color: "red",
+        }}
+      />,
+      };
+      break;
+    default:
+      break;
+  }
+  
   return (
     <Box sx={style.widget}>
-      <Box sx={{ padding:1 }}>
-        <Typography  sx={{ fontSize:18, color:"gray",}}>USERS</Typography>
+      <Box sx={{ padding: 1 }}>
+        <Typography sx={{ fontSize: 18, color: "gray" }}>
+          {data?.title.toUpperCase()}
+        </Typography>
       </Box>
-      <Box sx={{display:"flex",justifyContent:"center", alignItems:"center" }}>
-        <Typography sx={{ fontSize:30 }} >120</Typography>
+      <Box
+        sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
+      >
+        <Typography sx={{ fontSize: 30 }}>{data?.count}</Typography>
       </Box>
-      <Box  sx={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-        <Typography sx={{ fontSize:13, borderBottom:"1px solid black", width:"max-content", color:"gray" }}>View All Users</Typography>
-        <Person4Icon  sx={{ padding:"5px", backgroundColor:"#79E44E", borderRadius:1, color:"green" }} />
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Typography
+          sx={{
+            fontSize: 13,
+            borderBottom: "1px solid black",
+            width: "max-content",
+            color: "gray",
+            cursor:"pointer"
+          }}
+        >
+          {  data?.link
+          }
+        </Typography>
+        {data?.icon}
+        {/* <Person4Icon
+          sx={{
+            padding: "5px",
+            backgroundColor: "#79E44E",
+            borderRadius: 1,
+            color: "green",
+          }}
+        /> */}
       </Box>
     </Box>
   );
@@ -23,7 +196,7 @@ const Widgets = () => {
 const style = {
   widget: {
     display: "flex",
-    flexDirection:"column",
+    flexDirection: "column",
     flex: 1,
     margin: "10px",
     padding: "10px",

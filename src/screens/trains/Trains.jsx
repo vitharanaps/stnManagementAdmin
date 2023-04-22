@@ -258,7 +258,11 @@ return dayjs(convertedDate).fromNow(true)
     // navigate("/", { state: { id: id} });
     navigate(`/trains/${id}`)
    };
-
+   const [loadValue, setLoadValue] = useState(3)
+   const loadMore = () =>{
+    setLoadValue((prevValue)=> prevValue + 3)
+  }
+  
   return (
     <Box>
       <Navbar />
@@ -311,10 +315,12 @@ return dayjs(convertedDate).fromNow(true)
                   value={filterByLine}
                   onChange={handleChangeFilterByLine}
                 >
-                  <MenuItem value="">Select Line</MenuItem>
-                  <MenuItem value="Main Line">Main Line</MenuItem>
-                  <MenuItem value="Cost Line">Coast Line</MenuItem>
-                  <MenuItem value="KV Line">KV Line</MenuItem>
+                <MenuItem value="">Select Line</MenuItem>
+                  {linesFromDb.map((li) => (
+                    <MenuItem value={li?.lineNo} key={li.id}>
+                      {li?.lineName}
+                    </MenuItem>
+                  ))}
                 </Select>
                 {/*}  Home Station
                   <Select
@@ -370,7 +376,7 @@ return dayjs(convertedDate).fromNow(true)
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {filterderData.map((row) => (
+                      {filterderData.slice(0, loadValue).map((row) => (
                         <TableRow key={row.id}>
                           <TableCell align="center">{row?.trainNo}</TableCell>
                           <TableCell>{row?.line}</TableCell>
@@ -402,6 +408,22 @@ return dayjs(convertedDate).fromNow(true)
               </Box>
             </Box>
           </Stack>
+          {filterderData.length > 0 &&
+           <Stack
+           sx={{
+             justifyContent: "center",
+             marginBottom: 2,
+             alignItems: "center",
+           }}
+         >
+           <Box sx={style.loadMoreContainer}>
+             <Button variant="contained" color="secondary" onClick={loadMore} >
+               Load More
+             </Button>
+           </Box>
+         </Stack>
+          
+          }
         </Box>
       </Box>
 
@@ -674,6 +696,17 @@ const style = {
     boxShadow: "0px 23px 17px -14px rgba(0, 0, 0, 0.1)",
   },
   filterContainer: {
+    width: "95%",
+    display: "flex",
+    backgroundColor: "#fff",
+    height: 80,
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0px 23px 17px -14px rgba(0, 0, 0, 0.1)",
+    borderRadius: 1,
+  },
+
+  loadMoreContainer: {
     width: "95%",
     display: "flex",
     backgroundColor: "#fff",

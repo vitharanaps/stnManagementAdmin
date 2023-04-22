@@ -16,7 +16,7 @@ const columns = [
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Avatar
             alt="Avatar"
-            src={params.row.userImg}
+            src={params.row.profileImage}
             sx={{ marginRight: "15px" }}
           />
           {params.row.nameWithIn}

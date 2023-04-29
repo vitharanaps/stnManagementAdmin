@@ -84,10 +84,11 @@ const style = {
     flex: 1,
     backgroundColor: "#fff",
     margin: 1,
-    height: 400,
     boxShadow: "0px 23px 17px -14px rgba(0, 0, 0, 0.1)",
     borderRadius: 2,
     padding:3,
+    alignItems:"center",
+    justifyContent:"center"
   },
   stnChart: {
     flex: 1,

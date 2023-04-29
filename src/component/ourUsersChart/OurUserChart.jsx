@@ -1,90 +1,88 @@
-import React, { PureComponent } from 'react';
-import { PieChart, Pie, Sector, ResponsiveContainer } from 'recharts';
+import React, { useEffect, useState } from "react";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Doughnut } from "react-chartjs-2";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "../../firebase";
+import { async } from "@firebase/util";
+import { Box } from "@mui/material";
 
-const data = [
-  { name: 'Group A', value: 400 },
-  { name: 'Group B', value: 300 },
-  { name: 'Group C', value: 300 },
-  { name: 'Group D', value: 200 },
-];
+ChartJS.register(ArcElement, Tooltip, Legend);
 
-const renderActiveShape = (props) => {
-  const RADIAN = Math.PI / 180;
-  const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent, value } = props;
-  const sin = Math.sin(-RADIAN * midAngle);
-  const cos = Math.cos(-RADIAN * midAngle);
-  const sx = cx + (outerRadius + 10) * cos;
-  const sy = cy + (outerRadius + 10) * sin;
-  const mx = cx + (outerRadius + 30) * cos;
-  const my = cy + (outerRadius + 30) * sin;
-  const ex = mx + (cos >= 0 ? 1 : -1) * 22;
-  const ey = my;
-  const textAnchor = cos >= 0 ? 'start' : 'end';
+function OurUserChart() {
+  const [homeStationFromDb, setHomeStationFromDb] = useState([]);
+  const [userCountByStation,setUserCountByStation] = useState([]);
+  useEffect(() => {
+    const getHomeStations = async () => {
+      let listOfHomeStation = [];
+      try {
+        const querySnapshot = await getDocs(collection(db, "homeStation"));
+        querySnapshot.forEach((doc) => {
+          listOfHomeStation.push({ ...doc.data() });
+        });
+        setHomeStationFromDb(listOfHomeStation);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getHomeStations();
+  }, []);
 
-  return (
-    <g>
-      <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill}>
-        {payload.name}
-      </text>
-      <Sector
-        cx={cx}
-        cy={cy}
-        innerRadius={innerRadius}
-        outerRadius={outerRadius}
-        startAngle={startAngle}
-        endAngle={endAngle}
-        fill={fill}
-      />
-      <Sector
-        cx={cx}
-        cy={cy}
-        startAngle={startAngle}
-        endAngle={endAngle}
-        innerRadius={outerRadius + 6}
-        outerRadius={outerRadius + 10}
-        fill={fill}
-      />
-      <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
-      <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
-      <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">{`PV ${value}`}</text>
-      <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="#999">
-        {`(Rate ${(percent * 100).toFixed(2)}%)`}
-      </text>
-    </g>
-  );
-};
+  // Count Of Home Station Users
+  useEffect(() => {
+    let count = [];
+    const getUserCountByHomeStation = async (homeStation) => {
+      const q = query(
+        collection(db, "users"),
+        where("homeStation", "==", homeStation)
+      );
+      const querySnapShotsUsersCount = await getDocs(q);
+      count.push(querySnapShotsUsersCount.size);
+    
+     setUserCountByStation(count)
+    };
 
-export default class Example extends PureComponent {
-  static demoUrl = 'https://codesandbox.io/s/pie-chart-with-customized-active-shape-y93si';
-
-  state = {
-    activeIndex: 0,
+    for (let index = 0; index < homeStationFromDb.length; index++) {
+      getUserCountByHomeStation(homeStationFromDb[index].name);
+    }
+  }, [homeStationFromDb]);
+  const data = {
+    labels: homeStationFromDb.map((homeSt) => homeSt?.name),
+    datasets: [
+      {
+        label: "# of Users",
+        data: userCountByStation,
+        backgroundColor: [
+          "rgba(255, 99, 132, 0.2)",
+          "rgba(54, 162, 235, 0.2)",
+          "rgba(255, 206, 86, 0.2)",
+          "rgba(75, 192, 192, 0.2)",
+          "rgba(153, 102, 255, 0.2)",
+          "rgba(255, 159, 64, 0.2)",
+        ],
+        borderColor: [
+          "rgba(255, 99, 132, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+          "rgba(75, 192, 192, 1)",
+          "rgba(153, 102, 255, 1)",
+          "rgba(255, 159, 64, 1)",
+        ],
+        borderWidth: 1,
+      },
+    ],
   };
 
-  onPieEnter = (_, index) => {
-    this.setState({
-      activeIndex: index,
-    });
-  };
+  // //
+  // for (let index = 0; index < homeStationFromDb.length; index++) {
+  //   const element = homeStationFromDb[index]?.name;
+  //  console.log(element)
+  // }
+  return(
+  <Box sx={{ display:"flex", alignItems:"center", justifyContent:"center" }}>
+  <Doughnut data={data} />;
 
-  render() {
-    return (
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart width={400} height={400}>
-          <Pie
-            activeIndex={this.state.activeIndex}
-            activeShape={renderActiveShape}
-            data={data}
-            cx="50%"
-            cy="50%"
-            innerRadius={60}
-            outerRadius={80}
-            fill="#8884d8"
-            dataKey="value"
-            onMouseEnter={this.onPieEnter}
-          />
-        </PieChart>
-      </ResponsiveContainer>
-    );
-  }
+  </Box> 
+  )
 }
+
+export default OurUserChart;

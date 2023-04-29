@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Person4Icon from "@mui/icons-material/Person4";
 import { PersonOutline } from "@mui/icons-material";
@@ -8,74 +8,64 @@ import ArticleIcon from "@mui/icons-material/Article";
 import AddRoadIcon from "@mui/icons-material/AddRoad";
 
 const Widgets = ({ type }) => {
-
-
-  const [numOfUser, setNumOfUser] =useState(0)
-const [numOfStn,setNumOfStn] = useState(0)
-const [numOfLines,setNumOfLines] = useState(0)
-const [numOfPendingUsers,setNumOfPendingUsers] = useState(0)
-
+  const [numOfUser, setNumOfUser] = useState(0);
+  const [numOfStn, setNumOfStn] = useState(0);
+  const [numOfLines, setNumOfLines] = useState(0);
+  const [numOfPendingUsers, setNumOfPendingUsers] = useState(0);
+  const [loading, setloading] = useState(false);
 
   useEffect(() => {
-    const getUserCount = async() =>{
-
+    const getUserCount = async () => {
+      setloading(true);
       // const today = new Date();
       // const lastMonth = new Date(new Date().setMonth(today.getMonth()- 1))
       // const prevMonth = new Date(new Date().setMonth(today.getMonth()- 2))
 
-      const qUser = query(
-        collection(db, "users"));
+      const qUser = query(collection(db, "users"));
       const querySnapshotUser = await getDocs(qUser);
-    //  console.log(querySnapshotUser.docs)
       const countUser = querySnapshotUser.size;
-      setNumOfUser(countUser)
-    }
+      setNumOfUser(countUser);
+      setloading(false);
+    };
     getUserCount();
-    
-  
-  }, [])
+  }, []);
 
   useEffect(() => {
-    const getStnCount = async() =>{
-      const qStns = query(
-        collection(db, "stns"));
+    const getStnCount = async () => {
+      setloading(true);
+      const qStns = query(collection(db, "stns"));
       const querySnapshotStns = await getDocs(qStns);
-    //  console.log(querySnapshotUser.docs)
       const countStns = querySnapshotStns.size;
-      setNumOfStn(countStns)
-    }
+      setNumOfStn(countStns);
+      setloading(false);
+    };
     getStnCount();
-    
-  
-  }, [])
+  }, []);
   useEffect(() => {
-    const getLinesCount = async() =>{
-      const qLines = query(
-        collection(db, "lines"));
+    const getLinesCount = async () => {
+      setloading(true);
+      const qLines = query(collection(db, "lines"));
       const querySnapshotLines = await getDocs(qLines);
-    //  console.log(querySnapshotUser.docs)
+      //  console.log(querySnapshotUser.docs)
       const countLines = querySnapshotLines.size;
-      setNumOfLines(countLines)
-    }
+      setNumOfLines(countLines);
+      setloading(false);
+    };
     getLinesCount();
-    
-  
-  }, [])
-
+  }, []);
 
   useEffect(() => {
-    const getPendingUsers = async() =>{
+    const getPendingUsers = async () => {
+      setloading(true);
       const q = query(collection(db, "users"), where("isConfirm", "==", false));
 
       const querySnapshotPendingUsers = await getDocs(q);
-    //  console.log(querySnapshotUser.docs)
       const countPendingUsers = querySnapshotPendingUsers.size;
-      setNumOfPendingUsers(countPendingUsers)
-    }
+      setNumOfPendingUsers(countPendingUsers);
+      setloading(false);
+    };
     getPendingUsers();
-    
-  
-  }, [])
+  }, []);
   let data;
 
   switch (type) {
@@ -99,54 +89,60 @@ const [numOfPendingUsers,setNumOfPendingUsers] = useState(0)
     case "stn":
       data = {
         title: "STNS",
-        count : numOfStn,
+        count: numOfStn,
         link: "see all stns",
-        icon: <ArticleIcon
-        sx={{
-          padding: "5px",
-          backgroundColor: "#79E44E",
-          borderRadius: 1,
-          color: "green",
-        }}
-      />,
+        icon: (
+          <ArticleIcon
+            sx={{
+              padding: "5px",
+              backgroundColor: "#79E44E",
+              borderRadius: 1,
+              color: "green",
+            }}
+          />
+        ),
       };
       break;
     case "line":
       data = {
         title: "LINES",
-        count : numOfLines,
+        count: numOfLines,
 
         link: "see all lines",
-        icon: <AddRoadIcon
-        sx={{
-          padding: "5px",
-          backgroundColor: "#79E44E",
-          borderRadius: 1,
-          color: "green",
-        }}
-      />,
+        icon: (
+          <AddRoadIcon
+            sx={{
+              padding: "5px",
+              backgroundColor: "#79E44E",
+              borderRadius: 1,
+              color: "green",
+            }}
+          />
+        ),
       };
       break;
     case "pending":
       data = {
         title: "PENDING",
-        count : numOfPendingUsers,
+        count: numOfPendingUsers,
 
         link: "see all Pending",
-        icon: <Person4Icon
-        sx={{
-          padding: "5px",
-          backgroundColor: "#79E44E",
-          borderRadius: 1,
-          color: "red",
-        }}
-      />,
+        icon: (
+          <Person4Icon
+            sx={{
+              padding: "5px",
+              backgroundColor: "#79E44E",
+              borderRadius: 1,
+              color: "red",
+            }}
+          />
+        ),
       };
       break;
     default:
       break;
   }
-  
+
   return (
     <Box sx={style.widget}>
       <Box sx={{ padding: 1 }}>
@@ -157,7 +153,15 @@ const [numOfPendingUsers,setNumOfPendingUsers] = useState(0)
       <Box
         sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
       >
-        <Typography sx={{ fontSize: 30 }}>{data?.count}</Typography>
+        <Typography sx={{ fontSize: 30 }}>
+          {loading ? (
+            <Box>
+              <CircularProgress color="secondary" />{" "}
+            </Box>
+          ) : (
+            data?.count
+          )}
+        </Typography>
       </Box>
       <Box
         sx={{
@@ -172,11 +176,10 @@ const [numOfPendingUsers,setNumOfPendingUsers] = useState(0)
             borderBottom: "1px solid black",
             width: "max-content",
             color: "gray",
-            cursor:"pointer"
+            cursor: "pointer",
           }}
         >
-          {  data?.link
-          }
+          {data?.link}
         </Typography>
         {data?.icon}
         {/* <Person4Icon

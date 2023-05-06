@@ -7,7 +7,7 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useContext } from "react";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ArticleIcon from "@mui/icons-material/Article";
 import Person4Icon from "@mui/icons-material/Person4";
@@ -15,14 +15,19 @@ import TrainIcon from "@mui/icons-material/Train";
 import AddRoadIcon from "@mui/icons-material/AddRoad";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Link, useLocation } from "react-router-dom";
-import TrafficIcon from '@mui/icons-material/Traffic';
+import TrafficIcon from "@mui/icons-material/Traffic";
+import { AuthContext } from "../../context/AuthContext";
+
+
 const SideBar = () => {
   const location = useLocation();
   const path = location.pathname.split("/")[1];
-  console.log(path);
+
+  const { dispatch } = useContext(AuthContext);
+
 
   return (
-    <Box sx={style.container} position="fixed">
+    <Box sx={style.container} position="static">
       <Box sx={style.sideBarContainer}>
         <Typography color="#434242" sx={style.title}>
           Admin Panel
@@ -72,7 +77,10 @@ const SideBar = () => {
               <ListItemText primary="STNs" />
             </ListItemButton>
           </Link>
-          <Link to="/signals" style={{ textDecoration: "none", color: "black" }}>
+          <Link
+            to="/signals"
+            style={{ textDecoration: "none", color: "black" }}
+          >
             <ListItemButton
               sx={
                 path === "signals"
@@ -149,6 +157,20 @@ const SideBar = () => {
               <ListItemText primary="Lines" />
             </ListItemButton>
           </Link>
+          <Link to="/homeStation" style={{ textDecoration: "none", color: "black" }}>
+            <ListItemButton
+              sx={
+                path === "homeStation"
+                  ? style.listButtonStyleActive
+                  : style.listButtonStyle
+              }
+            >
+              <ListItemIcon>
+                <AddRoadIcon />
+              </ListItemIcon>
+              <ListItemText primary="Home Station" />
+            </ListItemButton>
+          </Link>
         </List>
 
         <Divider />
@@ -166,8 +188,8 @@ const SideBar = () => {
           SYSTEM
         </Typography>
         <Divider />
-        <List>
-          <ListItemButton sx={style.listButtonStyle}>
+        <List >
+          <ListItemButton sx={style.listButtonStyle} onClick={()=> dispatch({ type: "LOGOUT" })} >
             <ListItemIcon>
               <LogoutIcon />
             </ListItemIcon>

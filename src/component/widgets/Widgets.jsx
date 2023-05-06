@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress,Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Person4Icon from "@mui/icons-material/Person4";
 import { PersonOutline } from "@mui/icons-material";
@@ -6,6 +6,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase";
 import ArticleIcon from "@mui/icons-material/Article";
 import AddRoadIcon from "@mui/icons-material/AddRoad";
+import { Link } from "react-router-dom";
 
 const Widgets = ({ type }) => {
   const [numOfUser, setNumOfUser] = useState(0);
@@ -73,6 +74,7 @@ const Widgets = ({ type }) => {
       data = {
         title: "USERS",
         link: "see all users",
+        linkLink: "user",
         count: numOfUser,
         icon: (
           <Person4Icon
@@ -91,6 +93,8 @@ const Widgets = ({ type }) => {
         title: "STNS",
         count: numOfStn,
         link: "see all stns",
+        linkLink: "stn",
+
         icon: (
           <ArticleIcon
             sx={{
@@ -109,6 +113,8 @@ const Widgets = ({ type }) => {
         count: numOfLines,
 
         link: "see all lines",
+        linkLink: "lines",
+
         icon: (
           <AddRoadIcon
             sx={{
@@ -127,6 +133,8 @@ const Widgets = ({ type }) => {
         count: numOfPendingUsers,
 
         link: "see all Pending",
+        linkLink: "user",
+
         icon: (
           <Person4Icon
             sx={{
@@ -170,6 +178,7 @@ const Widgets = ({ type }) => {
           justifyContent: "space-between",
         }}
       >
+                <Link to={data?.linkLink} >
         <Typography
           sx={{
             fontSize: 13,
@@ -181,6 +190,7 @@ const Widgets = ({ type }) => {
         >
           {data?.link}
         </Typography>
+        </Link>
         {data?.icon}
         {/* <Person4Icon
           sx={{

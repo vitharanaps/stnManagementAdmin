@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from '../screens/homeScreen/Home';
 import Lines from '../screens/lines/Lines';
@@ -14,18 +14,19 @@ import ViewSignals from '../screens/viewSignals/ViewSignals';
 import ViewStns from '../screens/viewStns/ViewStns';
 import ViewTrain from '../screens/viewTrain/ViewTrain';
 import ViewUserDetails from '../screens/viewUserDetails/ViewUserDetails';
+import { AuthContext } from '../context/AuthContext';
+import HomeStation from '../screens/homeStation/HomeStation';
 
 const Navigation = () => {
 
-
-   // const { currentUser } = useContext(AuthContext);
-    const currentUser=true
-
-
+    const {currentUser} = useContext(AuthContext);
+   
     const RequireAuth = ({ children }) => {
         return currentUser ? (children) : <Navigate to="/login" />
     }
-
+   
+   
+  
     return (
         <BrowserRouter>
             <Routes >
@@ -56,6 +57,13 @@ const Navigation = () => {
                 </Route>
                 <Route path='lines' >
                     <Route index element={<RequireAuth><Lines /></RequireAuth>} />
+                    <Route path=":my" element={<RequireAuth><ViewLine /></RequireAuth>} />
+                    {/* <Route path="newuser" element={<RequireAuth><NewUser /></RequireAuth>} /> */}
+
+                     {/* <Route path='*' element={<NotFound />} /> */}
+                </Route>
+                <Route path='homeStation' >
+                    <Route index element={<RequireAuth><HomeStation /></RequireAuth>} />
                     <Route path=":my" element={<RequireAuth><ViewLine /></RequireAuth>} />
                     {/* <Route path="newuser" element={<RequireAuth><NewUser /></RequireAuth>} /> */}
 

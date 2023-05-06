@@ -1,10 +1,56 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
-import React from "react";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import React, { useContext, useState } from "react";
+import { auth, db } from "../../firebase";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 
+import { doc, getDoc } from "firebase/firestore";
 const Login = () => {
-  const handleLogin = (e) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
+
+  const { dispatch } = useContext(AuthContext);
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    
+    setLoading(true);
+    await signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        getUserDetails(user);
+      })
+      .catch((error) => {
+        setError(true);
+      });
+    setLoading(false);
+  };
+
+  //check if admin
+
+  const getUserDetails = async (user) => {
+    const docRef = doc(db, "users", user?.uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      if (docSnap.data().role === "admin") {
+        localStorage.setItem("user", JSON.stringify(docSnap.data()));
+
+        dispatch({ type: "LOGIN", payload: docSnap.data() });
+        navigate("/");
+      }
+    } else {
+      console.log("No such document!");
+    }
   };
   return (
     <Box
@@ -34,7 +80,7 @@ const Login = () => {
       >
         <Box>
           <Typography variant="h6" color="gray">
-            Welcome To STN Manager
+            Welcome To CRGU TT App Manager
           </Typography>
         </Box>
         <form onSubmit={handleLogin}>
@@ -43,9 +89,10 @@ const Login = () => {
               <TextField
                 id="outlined-required"
                 label="Email"
-                placeholder="Youreemail@gmail.com"
+                placeholder="Youremail@gmail.com"
                 type="text"
                 size="fullwidth"
+                onChange={(e) => setEmail(e.target.value)}
               />
             </Box>
 
@@ -55,8 +102,15 @@ const Login = () => {
                 label="Password"
                 type="password"
                 size="fullwidth"
+                onChange={(e) => setPassword(e.target.value)}
               />
             </Box>
+            {error && (
+              <Typography variant="body2" color="error">
+                Something Went Wrong
+              </Typography>
+            )}
+
             <Box
               sx={{
                 display: "flex",
@@ -65,9 +119,14 @@ const Login = () => {
                 justifyContent: "center",
               }}
             >
-              <Button variant="contained" type="submit">
-                Sign In
-              </Button>
+              {loading ? (
+                <CircularProgress />
+              ) : (
+                <Button variant="contained" type="submit">
+                  Sign In
+                </Button>
+              )}
+
               <Button variant="outlined" type="reset">
                 Reset
               </Button>
